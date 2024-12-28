@@ -1,0 +1,6 @@
+--class-path src
+--main Main
+
+--library raylib
+--library ase
+--library kumoui

@@ -1,0 +1,21 @@
+{
+  "images":
+  [
+    "content/sketch0.ase",
+    "content/tileset.ase",
+    "content/sketch1.ase",
+    "content/player.ase",
+    "content/shooter.ase",
+    "content/boss.ase",
+    "content/table.ase",
+    "content/bosshead.ase",
+    "content/ui.ase",
+    "content/cursor.ase",
+    "content/logo.ase"
+  ],
+  "rooms":
+  [
+    "content/test.json"
+  ],
+  "entities": "content/entities.json"
+}

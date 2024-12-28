@@ -1,0 +1,7 @@
+common.hxml
+--cpp bin/web
+--define wasm
+--define emscripten
+--define HXCPP_LINK_EMSCRIPTEN_EXT=.html
+--define HXCPP_LINK_MEMORY_GROWTH
+--macro WebAssetPath.setAssetPath("content")
