@@ -444,7 +444,10 @@ class Game implements Module {
       text(spl[currentLinePlayer], px, py, 8, bgc);
       text(spl[currentLinePlayer].substring(0, currentCharPlayer), px, py, 8, fg);
       if(spl[currentLinePlayer].charAt(currentCharPlayer) == String.fromCharCode(Raylib.getCharPressed()) && canAttack) {currentCharPlayer++;cameraShake=true;}
-      py += 32;
+      py += 8;
+      var o = Raylib.measureTextEx(font, spl[currentLinePlayer].substring(0, currentCharPlayer), 8, 0);
+      // text("^", px+o.x, py, 8, fg);
+      text("-", px+o.x, py, 8, fg);
 
       // spl[currentLineEnemy] = StringTools.ltrim(spl[currentLineEnemy]);
       // text(spl[currentLineEnemy], px, py, 8, border);
