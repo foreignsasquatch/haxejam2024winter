@@ -1,3 +1,6 @@
+import cpp.Pointer;
+import cpp.RawPointer;
+import Raylib.Shader;
 import engine.App;
 import Raylib.Sound;
 import Raylib.RlVector2;
@@ -40,6 +43,8 @@ class Game implements Module {
   var currentCharPlayer = 0;
   var currentCharEnemy = 0;
 
+  // var shader:Shader;
+
   var canAttack = false;
 
   var enemyDialogues = [
@@ -51,18 +56,18 @@ class Game implements Module {
   var enemyOnHitDialogues = [
     "Please I have a wife",
     "I love you",
-    "I see that doesn't work",
+    "Are you god?",
     "You'll pay for this... or i will",
     "Leave me alone please.",
     "I'm pregnant",
     "NOOOOOO",
-    "Mah moneh",
-    "This is boring take me already",
-    "-_-",
-    "I'll pay you more if u stop",
+    "Take me already",
+    "*cries*",
+    "You are no man..",
+    "Father, please save me",
     "Get away!!!",
-    "Creep, Weirdo",
-    "Love when u do that babe"
+    "You Creep, You Weirdo",
+    "Good night mama, Good night."
   ];
   var changeHitDialogue = false;
   var randomdialoguetimer = 0.0;
@@ -81,12 +86,13 @@ class Game implements Module {
   var curtain = 360;
 
   var font:Font;
-
+  var secondsLoc:Int;
   public function new() {
     Raylib.hideCursor();
     Raylib.disableCursor();
 
     camera = Raylib.Camera2D.create(RlVector2.zero(), RlVector2.zero());
+    // Raylib.setShaderValue(shader, Raylib.getShaderLocation(shader, "size"), RawPointer.addressOf(screenSize));
 
     font = Raylib.loadFont("content/quaver.ttf");
     Raylib.setTextureFilter(font.texture, TextureFilter.POINT);
@@ -108,6 +114,8 @@ class Game implements Module {
     // enemies.push(new Shooter());
     for(i in 0...3) {
       var e = new Shooter(148 + Raylib.getRandomValue(-20, 30), 188 + (32 * i));
+      if(i == 1) @:privateAccess e.spr.assetName = "content/half.ase";
+      if(i == 2) @:privateAccess e.spr.assetName = "content/vamp.ase";
       var t = Raylib.getRandomValue(0, 2);
       if(t == 0) {e.spr.tint = Raylib.Color.create(214, 36, 17, 255); e.spr.direction = -1;}
       else if(t==1) {e.spr.tint = Raylib.Color.create(255, 128, 164, 255);e.spr.direction = 1;}
@@ -116,7 +124,9 @@ class Game implements Module {
     }
   }
 
+  var seconds:Float;
   public function update() {
+
     Raylib.updateMusicStream(ambient);
     Raylib.updateMusicStream(music);
     player.update();
@@ -230,19 +240,19 @@ class Game implements Module {
           if(e.x < 28) edir = 1;
         } else if(enemyNames[0] == "H.Wheat") {
           e.x += 1.5 * 1;
-          if(e.spr.direction != 0) e.spr.direction = edir;
+          e.spr.direction = edir;
           if(e.x > 423) {e.x = 28;}
           r.width = 128 + 64;
           mult =  1.5;
         } else if(enemyNames[0] == "Haihjks") {
-          // mult = 1.5;
-          e.x += 0.8 * edir;
-          e.y += 0.8 * ydir;
-          if(e.spr.direction != 0) e.spr.direction = edir;
+          mult = 0.5;
+          e.x += 1 * edir;
+          e.y += 1.5 * ydir;
+          e.spr.direction = edir;
           if(e.x > 423) {e.x = 28;}
-          offx = -80;
-          offy = 80;
-          r.width = 160;
+          r.x += 64-16;
+          // offy = 80;
+          r.width = 64;
           if(e.y > 265-32) ydir = -1;
           if(e.y < 180) ydir = 1;
         }
@@ -283,7 +293,7 @@ class Game implements Module {
     if(gameOver) {
       Raylib.pauseMusicStream(music);
       Raylib.drawRectangle(0, 0, 480, 360, Raylib.Colors.BLACK);
-      if(enemies.length > 0) text("no insurance for u >:D", 480/2-Raylib.measureText("no insurance for u", 8)/2, 360/2-4, 8, hg); else text("you've won! do die soon for another visit", 480/2-Raylib.measureText("you've won! do die soon for another visiit", 8)/2, 360/2-4, 8, hg);
+      if(enemies.length > 0) text("no insurance for u... not like u need it", 480/2-Raylib.measureText("no insurance for u... not like u need it", 8)/2, 360/2-4, 8, hg); else text("you've won! do die soon for another visit", 480/2-Raylib.measureText("you've won! do die soon for another visit", 8)/2, 360/2-4, 8, hg);
       if(!(enemies.length == 0))text("press [space] to play again", 480/2-Raylib.measureText("press [space] to play again", 8)/2, 360/2-4+8, 8, hg);
       if(Raylib.isKeyPressed(Raylib.Keys.SPACE) && enemies.length > 0) {
         // App.setModule(Game);
@@ -357,25 +367,25 @@ class Game implements Module {
       text("CEO", px, py, 8, hg);
       py += 10;      
       if(enemies.length == 3) {
-      text("*ahem* YOU can claim YOUR insurance by eliminating competition and DO IT QUICK", px, py, 8, fg);
+      text("*ahem* YOU can claim YOUR insurance by collecting money on our behalf and DO IT QUICK", px, py, 8, fg);
       py+=8;
-      text("they might run idk :DDD", px, py, 8, fg);
+      text("they might run but it's all in your mind still", px, py, 8, fg);
       py += 8;
       text("Press [SPACE] to start now!", px, py, 8, fg);
       } else if(enemies.length == 2) {
         text("Alright that was a good one, you need to get better at this though ;)", px, py, 8, fg);
         py+=8;
-        text("the next person is VERY smart and u might dieeee", px, py, 8, fg);
+        text("the next person is VERY smart and u might have some trouble", px, py, 8, fg);
         py += 8;
         text("Press [SPACE] to start now!", px, py, 8, fg);
       } else if(enemies.length == 1) {
-        text("Damn... alright. you wont get past her though", px, py, 8, fg);
+        text("you wont get past her like last time", px, py, 8, fg);
         py+=8;
         text("cya at the start again", px, py, 8, fg);
         py += 8;
         text("Press [SPACE] to start now!", px, py, 8, fg);
       } else if(enemies.length == 0) {
-        text("...", px, py, 8, fg);
+        text("why do you always have to come?", px, py, 8, fg);
         py+=8;
         text("i guess you've done it", px, py, 8, fg);
         py += 8;
@@ -451,7 +461,7 @@ class Game implements Module {
         enemyProfession.remove(enemyProfession[0]);
         enemyDialogues.remove(enemyDialogues[0]);
         enemyNames.remove(enemyNames[0]);
-        enemyFiles.remove(enemyNames[0]);
+        enemyFiles.remove(enemyFiles[0]);
         lineTimer = 20;
         killcount++;
         currentLinePlayer = 0;

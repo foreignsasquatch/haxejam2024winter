@@ -11,7 +11,10 @@
     "content/bosshead.ase",
     "content/ui.ase",
     "content/cursor.ase",
-    "content/logo.ase"
+    "content/logo.ase",
+    "content/wheat.ase",
+    "content/half.ase",
+    "content/vamp.ase"
   ],
   "rooms":
   [
