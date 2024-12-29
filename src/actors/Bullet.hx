@@ -32,10 +32,16 @@ class Bullet {
     for(e in Game.enemies) {
       if(Raylib.checkCollisionCircleRec(Vector2.create(x, y), 8, Raylib.Rectangle.create(e.x, e.y, 32, 32))) {
         killed = true;
-        e.hit(0);
+        // e.hit(0);
       }
     }
 
-    Raylib.drawCircle(Std.int(x), Std.int(y), 8, color);
+    Raylib.drawCircleLines(Std.int(x+8), Std.int(y+8), 16, Raylib.Color.create(255, 231, 214, 255));
+    for(i in 0...Raylib.getRandomValue(1, 4)) {
+        var xx = x - 8 + Raylib.getRandomValue(5, 50);
+        var yx = y  - 8 + Raylib.getRandomValue(5, 30);
+        Raylib.drawCircleLines(Std.int(xx), Std.int(yx), Raylib.getRandomValue(8, 16), Raylib.Color.create(255, 38, 116, 255));
+    }
+    // Raylib.drawCircle(Std.int(x), Std.int(y), 8, color);
   }
 }

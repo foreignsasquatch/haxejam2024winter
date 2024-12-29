@@ -74,8 +74,7 @@ class Player {
       if((y+32) > 360) y = 360-32;
 
       // if(Raylib.isKeyPressed(Raylib.Keys.X))  {
-      //   if(sprite.direction == -1) bullets.push(new Bullet(x+32, y+16, -sprite.direction));
-      //   else bullets.push(new Bullet(x, y+16, -sprite.direction));
+
       // }
 
       for(b in bullets) if(b.killed) bullets.remove(b);
@@ -101,6 +100,11 @@ class Player {
     //     }
     //   }
     // }
+  }
+
+  public function shoot() {
+    // if(sprite.direction == -1) bullets.push(new Bullet(x+32, y+16, -sprite.direction));
+    // else bullets.push(new Bullet(x, y+16, -sprite.direction));
   }
 
   public function move() {

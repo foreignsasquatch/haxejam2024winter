@@ -32,8 +32,8 @@ class Game implements Module {
 
   var enemyFiles:Array<String> = [File.getContent("content/luigi"), File.getContent("content/halfwheat"), File.getContent("content/headm")];
   var enemy = 0;
-  var enemyNames = ["Luigi", "Halfwheat", "Haihjks"];
-  var enemyProfession = ["Plumber", "Intellectual", "Princess Vampire"];
+  var enemyNames = ["Luigi", "H.Wheat", "Haihjks"];
+  var enemyProfession = ["Plumber", "Genius", "Princess Vampire"];
   var enemyAmount = 512;
   var currentLinePlayer = 0;
   var currentLineEnemy = 0;
@@ -44,10 +44,27 @@ class Game implements Module {
 
   var enemyDialogues = [
     "I've been waiting for 2 months now",
-    "My baby can finally be born",
-    "I hope they pay for this",
-    "I love capitalism"
+    "I have a broken collar bone",
+    "I love capitalism",
+    "Plastic surgery isn't costly is it"
   ];
+  var enemyOnHitDialogues = [
+    "Please I have a wife",
+    "I love you",
+    "I see that doesn't work",
+    "You'll pay for this... or i will",
+    "Leave me alone please.",
+    "I'm pregnant",
+    "NOOOOOO",
+    "Mah moneh",
+    "This is boring take me already",
+    "-_-",
+    "I'll pay you more if u stop",
+    "Get away!!!",
+    "Creep, Weirdo",
+    "Love when u do that babe"
+  ];
+  var changeHitDialogue = false;
   var randomdialoguetimer = 0.0;
 
   public static var startPlay = false;
@@ -66,8 +83,8 @@ class Game implements Module {
   var font:Font;
 
   public function new() {
-    // Raylib.hideCursor();
-    // Raylib.disableCursor();
+    Raylib.hideCursor();
+    Raylib.disableCursor();
 
     camera = Raylib.Camera2D.create(RlVector2.zero(), RlVector2.zero());
 
@@ -84,27 +101,26 @@ class Game implements Module {
     Raylib.setMusicVolume(ambient, 10);
     music = Raylib.loadMusicStream("content/vishwa_old_beat.wav");
     music.looping = true;
-    Raylib.setMusicVolume(music, .6);
+    Raylib.setMusicVolume(music, .4);
 
     // typing = Raylib.loadSound("content/typing.mp3");
 
     // enemies.push(new Shooter());
-    for(i in 0...4) {
+    for(i in 0...3) {
       var e = new Shooter(148 + Raylib.getRandomValue(-20, 30), 188 + (32 * i));
       var t = Raylib.getRandomValue(0, 2);
       if(t == 0) {e.spr.tint = Raylib.Color.create(214, 36, 17, 255); e.spr.direction = -1;}
-      else if(t==1) e.spr.tint = Raylib.Color.create(255, 128, 164, 255);
+      else if(t==1) {e.spr.tint = Raylib.Color.create(255, 128, 164, 255);e.spr.direction = 1;}
       else {e.spr.tint = Raylib.Color.create(16, 210, 177, 255); e.spr.direction = 1;}
       enemies.push(e);
     }
-    trace(enemies);
   }
 
   public function update() {
     Raylib.updateMusicStream(ambient);
     Raylib.updateMusicStream(music);
     player.update();
-    for(i in 0...enemies.length-1) {
+    for(i in 0...enemies.length) {
       var s = enemies[i];
       s.update();
     }
@@ -124,6 +140,9 @@ class Game implements Module {
   var b = true;
   var mpos = Vector2.zero();
   var edir = 1;
+  var hitDialouge:String;
+  var killcount = 0;
+  var ydir = 1;
   public function draw() {
   if(!gameOver) {
     Raylib.beginMode2D(camera);
@@ -140,6 +159,7 @@ class Game implements Module {
     Raylib.drawTexture(Assets.images["content/boss.ase"].spritesheet, 126, Std.int(46+by), Raylib.Colors.WHITE);
     Raylib.drawTexture(Assets.images["content/bosshead.ase"].spritesheet, 188, Std.int(48+hy), Raylib.Colors.WHITE);
     Raylib.drawTexture(Assets.images["content/table.ase"].spritesheet, 126, 46, Raylib.Colors.WHITE);
+    if(killcount > 0) text('...ye were surpposed to collect nort, kill en $killcount people', 255, 47, 8, fg);
 
     randomdialoguetimer += Raylib.getFrameTime();
     for(s in enemies) {
@@ -150,6 +170,10 @@ class Game implements Module {
       } 
       if(enemies.indexOf(s) == enemy && !startPlay) {
         s.draw();
+      }
+      if(enemies.indexOf(s) == 0 && !startPlay) {
+        if(s.y > player.y) {s.y -= 1;s.spr.y = s.y;}
+        else {}
       }
       // if(randomdialoguetimer >= 10) {
         // var i = Raylib.getRandomValue(0, 3);
@@ -162,6 +186,10 @@ class Game implements Module {
       // }
     }
     if(!startPlay) player.draw();
+
+    if(!startPlay) {
+      if(player.y > 190) text("go to the desk", player.x + 32, player.y, 8, fg);
+    }
     // Raylib.drawTexture(Assets.images["content/sketch1.ase"].spritesheet, 0, 0, Raylib.Colors.WHITE);
     // phone();
 
@@ -172,6 +200,7 @@ class Game implements Module {
       if(!showstart) text("Press [SPACE] to start", player.x+32, 175, 8, Raylib.Colors.WHITE);
       if(Raylib.isKeyReleased(Keys.SPACE)) {
         showstart = true;
+        hitDialouge = enemyOnHitDialogues[0];
       }
     }
 
@@ -185,22 +214,46 @@ class Game implements Module {
         Raylib.drawTexture(Assets.images["content/boss.ase"].spritesheet, 126, Std.int(46+by), Raylib.Colors.WHITE);
         Raylib.drawTexture(Assets.images["content/bosshead.ase"].spritesheet, 188, Std.int(48+hy), Raylib.Colors.WHITE);
         Raylib.drawTexture(Assets.images["content/table.ase"].spritesheet, 126, 46, Raylib.Colors.WHITE);
-        player.draw();
+
         var e = enemies[enemy];
         e.draw();
 
-        if(enemy == 0) {
+        var offx = 64;
+        var offy = 0;
+        var r = Raylib.Rectangle.create(Std.int(e.x - offx), Std.int(e.y-offy), 128+64, 32);
+
+        if(enemyNames[0] == "Luigi") {
           e.x += 1 * edir;
+          e.spr.direction = edir;
           if(e.x > 420) edir = -1;
           if(e.x < 28) edir = 1;
+        } else if(enemyNames[0] == "H.Wheat") {
+          e.x += 1.5 * 1;
+          if(e.spr.direction != 0) e.spr.direction = edir;
+          if(e.x > 423) {e.x = 28;}
+          r.width = 128 + 64;
+        } else if(enemyNames[0] == "Haihjks") {
+          e.x += 0.8 * edir;
+          e.y += 0.8 * ydir;
+          if(e.spr.direction != 0) e.spr.direction = edir;
+          if(e.x > 423) {e.x = 28;}
+          offx = -80;
+          offy = 80;
+          r.width = 160;
+          if(e.y > 265-32) ydir = -1;
+          if(e.y < 180) ydir = 1;
         }
 
-        var r = Raylib.Rectangle.create(Std.int(e.x - 64), Std.int(e.y), 128+64, 32);
         Raylib.drawRectangleLinesEx(r, 1, e.spr.tint);
+
+        // if(b)
+        if(changeHitDialogue) {hitDialouge = enemyOnHitDialogues[Raylib.getRandomValue(0, enemyOnHitDialogues.length-1)]; changeHitDialogue = false;}
+        if(enemyAmount < 512) text(hitDialouge, e.x - (Raylib.measureText(hitDialouge, 8)/2), e.y + 40, 8, e.spr.tint);
 
         if(Raylib.checkCollisionRecs(r, Raylib.Rectangle.create(player.x, player.y, 32, 32))) {
           canAttack = true;
         } else canAttack = false;
+        player.draw();
       }
     } 
 
@@ -227,10 +280,12 @@ class Game implements Module {
     if(gameOver) {
       Raylib.pauseMusicStream(music);
       Raylib.drawRectangle(0, 0, 480, 360, Raylib.Colors.BLACK);
-      text("no insurance for u >:D", 480/2-Raylib.measureText("no insurance for u", 8)/2, 360/2-4, 8, hg);
-      text("press [space] to play again", 480/2-Raylib.measureText("press [space] to play again", 8)/2, 360/2-4+8, 8, hg);
-      if(Raylib.isKeyPressed(Raylib.Keys.SPACE)) {
+      if(enemies.length > 0) text("no insurance for u >:D", 480/2-Raylib.measureText("no insurance for u", 8)/2, 360/2-4, 8, hg); else text("you've won! do die soon for another visit", 480/2-Raylib.measureText("you've won! do die soon for another visiit", 8)/2, 360/2-4, 8, hg);
+      if(!(enemies.length == 0))text("press [space] to play again", 480/2-Raylib.measureText("press [space] to play again", 8)/2, 360/2-4+8, 8, hg);
+      if(Raylib.isKeyPressed(Raylib.Keys.SPACE) && enemies.length > 0) {
         // App.setModule(Game);
+        enemies = null;
+        enemies = [];
         for(i in 0...4) {
           var e = new Shooter(148 + Raylib.getRandomValue(-20, 30), 188 + (32 * i));
           var t = Raylib.getRandomValue(0, 2);
@@ -249,13 +304,14 @@ class Game implements Module {
         currentLineEnemy = 0;
         currentCharPlayer = 0;
         currentCharEnemy = 0;
+        killcount = 0;
       }
     }
   }
 
   public function ui() {
     #if debug
-    Raylib.drawFPS(0, 0);
+    // Raylib.drawFPS(0, 0);
     #end
     // Raylib.drawText('${player.debt}', 100, 0, 32, Raylib.Colors.RED);
   }
@@ -274,7 +330,9 @@ class Game implements Module {
     y+=8;
     text('Debt: ', x, y, 8, fg);
     var asdad = Raylib.measureTextEx(font, "Debt: ", 8, 0);
-    text('${enemyAmount}', x+asdad.x, y, 8, hg);
+    text('${512-enemyAmount}/512', x+asdad.x, y, 8, fg);
+    y+=12;
+    text('"Collect" the money from him', x, y, 8, fg);
 
     // text('Your debt is', 396, 350, 8, fg);
     // var asdad = Raylib.measureTextEx(font, "your debt is ", 8, 0);
@@ -293,16 +351,42 @@ class Game implements Module {
 
       px += 4;
       py += 4;
-      // Raylib.beginScissorMode(x, y , )
       text("CEO", px, py, 8, hg);
-      py += 10;
+      py += 10;      
+      if(enemies.length == 3) {
       text("*ahem* YOU can claim YOUR insurance by eliminating competition and DO IT QUICK", px, py, 8, fg);
       py+=8;
       text("they might run idk :DDD", px, py, 8, fg);
       py += 8;
       text("Press [SPACE] to start now!", px, py, 8, fg);
+      } else if(enemies.length == 2) {
+        text("Alright that was a good one, you need to get better at this though ;)", px, py, 8, fg);
+        py+=8;
+        text("the next person is VERY smart and u might dieeee", px, py, 8, fg);
+        py += 8;
+        text("Press [SPACE] to start now!", px, py, 8, fg);
+      } else if(enemies.length == 1) {
+        text("Damn... alright. you wont get past her though", px, py, 8, fg);
+        py+=8;
+        text("cya at the start again", px, py, 8, fg);
+        py += 8;
+        text("Press [SPACE] to start now!", px, py, 8, fg);
+      } else if(enemies.length == 0) {
+        text("...", px, py, 8, fg);
+        py+=8;
+        text("i guess you've done it", px, py, 8, fg);
+        py += 8;
+        text("*sigh* Press [SPACE] to recieve your money...", px, py, 8, fg);
+        if(Raylib.isKeyPressed(Keys.SPACE)) gameOver = true;
+      } else {
+        text("You can always try again here", px, py, 8, fg);
+        py+=8;
+        text("or leave depends on your sanity", px, py, 8, fg);
+        py += 8;
+        text("Press [SPACE] to start now!", px, py, 8, fg);
+      }
     
-      if(Raylib.isKeyPressed(Keys.SPACE)) {startPlay = true; showstart = false; curtain = 360;}
+      if(Raylib.isKeyPressed(Keys.SPACE) && enemies.length > 0) {startPlay = true; showstart = false; curtain = 360;}
     }
 
     if(startPlay) {
@@ -316,13 +400,13 @@ class Game implements Module {
 
       px+=4;
       py+=4;
-      text("NOT UR CONTRACT", px, py, 8, hg);
-      var asdasd = Raylib.measureTextEx(font, "NOT UR CONTRACT", 8, 0);
+      text("CONTRACT", px, py, 8, hg);
+      var asdasd = Raylib.measureTextEx(font, "CONTRACT", 8, 0);
       var spl = enemyFiles[enemy].split(".");
       if(currentCharPlayer == spl[currentLinePlayer].length) {
         if(canAttack) text("press [enter] to go to attack", px+asdasd.x+2, py, 8, fg);
         else text("stay in the box!!!", px+asdasd.x+2, py, 8, fg);
-        if(Raylib.isKeyPressed(Keys.ENTER)) {currentLinePlayer++;currentCharPlayer = 0;enemyAmount -= Std.int(1/spl.length * 100);lineTimer=20;enemies[enemy].newhit();}
+        if(Raylib.isKeyPressed(Keys.ENTER)) {currentLinePlayer++;currentCharPlayer = 0;enemyAmount -= 64;lineTimer=20;enemies[enemy].newhit();player.shoot();changeHitDialogue = true;}
       } else
         if(!canAttack) text("STAY IN THE BOX to type!!", px+asdasd.x+2, py, 8, fg);
         else text("start typing!!!", px+asdasd.x+2, py, 8, fg);
@@ -348,6 +432,20 @@ class Game implements Module {
       // text(spl[currentLineEnemy].substring(0, currentCharEnemy), px, py, 8, fg);
       // Timer.delay(()->{currentCharEnemy++;}, 500);
       // if(spl[currentLinePlayer].charAt(currentCharPlayer) == String.fromCharCode(Raylib.getCharPressed())) currentCharPlayer++;
+
+      if(Raylib.isKeyPressed(Raylib.Keys.F9)) enemyAmount = 0;
+      if(enemyAmount == 0) {
+        startPlay = false;
+        Raylib.pauseMusicStream(music);
+        enemies.remove(enemies[enemy]);
+        enemyAmount = 512;
+        enemyProfession.remove(enemyProfession[0]);
+        enemyDialogues.remove(enemyDialogues[0]);
+        enemyNames.remove(enemyNames[0]);
+        lineTimer = 20;
+        killcount++;
+        // enemy++;
+      }
     }
   }
 
