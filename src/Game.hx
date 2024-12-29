@@ -143,6 +143,7 @@ class Game implements Module {
   var hitDialouge:String;
   var killcount = 0;
   var ydir = 1;
+  var mult = 1.;
   public function draw() {
   if(!gameOver) {
     Raylib.beginMode2D(camera);
@@ -232,7 +233,9 @@ class Game implements Module {
           if(e.spr.direction != 0) e.spr.direction = edir;
           if(e.x > 423) {e.x = 28;}
           r.width = 128 + 64;
+          mult =  1.5;
         } else if(enemyNames[0] == "Haihjks") {
+          // mult = 1.5;
           e.x += 0.8 * edir;
           e.y += 0.8 * ydir;
           if(e.spr.direction != 0) e.spr.direction = edir;
@@ -284,16 +287,16 @@ class Game implements Module {
       if(!(enemies.length == 0))text("press [space] to play again", 480/2-Raylib.measureText("press [space] to play again", 8)/2, 360/2-4+8, 8, hg);
       if(Raylib.isKeyPressed(Raylib.Keys.SPACE) && enemies.length > 0) {
         // App.setModule(Game);
-        enemies = null;
-        enemies = [];
-        for(i in 0...4) {
-          var e = new Shooter(148 + Raylib.getRandomValue(-20, 30), 188 + (32 * i));
-          var t = Raylib.getRandomValue(0, 2);
-          if(t == 0) {e.spr.tint = Raylib.Color.create(214, 36, 17, 255); e.spr.direction = -1;}
-          else if(t==1) e.spr.tint = Raylib.Color.create(255, 128, 164, 255);
-          else {e.spr.tint = Raylib.Color.create(16, 210, 177, 255); e.spr.direction = 1;}
-          enemies.push(e);
-        }
+        // enemies = null;
+        // enemies = [];
+        // for(i in 0...4) {
+        //   var e = new Shooter(148 + Raylib.getRandomValue(-20, 30), 188 + (32 * i));
+        //   var t = Raylib.getRandomValue(0, 2);
+        //   if(t == 0) {e.spr.tint = Raylib.Color.create(214, 36, 17, 255); e.spr.direction = -1;}
+        //   else if(t==1) e.spr.tint = Raylib.Color.create(255, 128, 164, 255);
+        //   else {e.spr.tint = Raylib.Color.create(16, 210, 177, 255); e.spr.direction = 1;}
+        //   enemies.push(e);
+        // }
         gameOver = false;
         showstart = false;
         startPlay = false;
@@ -409,20 +412,26 @@ class Game implements Module {
         if(Raylib.isKeyPressed(Keys.ENTER)) {currentLinePlayer++;currentCharPlayer = 0;enemyAmount -= 64;lineTimer=20;enemies[enemy].newhit();player.shoot();changeHitDialogue = true;}
       } else
         if(!canAttack) text("STAY IN THE BOX to type!!", px+asdasd.x+2, py, 8, fg);
-        else text("start typing!!!", px+asdasd.x+2, py, 8, fg);
+        else text("start typing the text below!!!", px+asdasd.x+2, py, 8, fg);
       py += 10;
 
       // Raylib.drawRectangle(px, py, Std.int(rec.width-8 * ((enemyAmount/512))), 4, fg);
       // Timer.delay(()->{lineTimer--;}, 1000);
-      if(curtain == 0) lineTimer -= Raylib.getFrameTime();
+      if(curtain == 0) lineTimer -= Raylib.getFrameTime() * mult;
       // trace(lineTimer);
       Raylib.drawRectangle(px, py, Std.int((rec.width-8) * (lineTimer/20)), 4, enemies[enemy].spr.tint);
       py += 6;
 
       // line logic
-      var spl = enemyFiles[enemy].split(".");
+      trace(enemies);
+      trace(enemyFiles);
+      var spl = enemyFiles[0].split(".");
       spl[currentLinePlayer] = StringTools.ltrim(spl[currentLinePlayer]);
-      text(spl[currentLinePlayer], px, py, 8, border);
+      var t = Raylib.measureTextEx(font, spl[currentLinePlayer], 8, 0);
+      Raylib.drawRectangle(px, py, Std.int(t.x)+2, 8+4, hg);
+      px += 2;
+      py += 4;
+      text(spl[currentLinePlayer], px, py, 8, bgc);
       text(spl[currentLinePlayer].substring(0, currentCharPlayer), px, py, 8, fg);
       if(spl[currentLinePlayer].charAt(currentCharPlayer) == String.fromCharCode(Raylib.getCharPressed()) && canAttack) {currentCharPlayer++;cameraShake=true;}
       py += 32;
@@ -442,8 +451,10 @@ class Game implements Module {
         enemyProfession.remove(enemyProfession[0]);
         enemyDialogues.remove(enemyDialogues[0]);
         enemyNames.remove(enemyNames[0]);
+        enemyFiles.remove(enemyNames[0]);
         lineTimer = 20;
         killcount++;
+        currentLinePlayer = 0;
         // enemy++;
       }
     }
