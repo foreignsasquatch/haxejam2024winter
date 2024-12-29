@@ -8,6 +8,9 @@ class Shooter extends Enemy {
   public var spr:Sprite;
   var bullets:Array<Bullet> = [];
 
+  public function newhit() {
+  }
+
   public function new(x:Float, y:Float) {
     super();
     this.x = x;
@@ -15,10 +18,9 @@ class Shooter extends Enemy {
 
     spr = new Sprite("content/shooter.ase", x, y);
   }
-
   var t =0.;
   override function update() {
-    super.update();
+    // if(killed) Game.enemies.remove(this);
 
     var p = Game.player;
     if(!isHit) {
@@ -27,19 +29,23 @@ class Shooter extends Enemy {
 
     // if(y < p.y) y += spd;
     // else if(y > p.y) y -= spd;
-    var r = Raylib.getRandomValue(0, 3);
-    t+=Raylib.getFrameTime();
-    if(t >= 3) {
-      var b = new Bullet(x, y+16, spr.direction);
-      b.color = Raylib.Color.create(214, 26, 17, 255);
-      bullets.push(b);
-    }
-    } else {
-      x += 20 * -spr.direction;
+    // var r = Raylib.getRandomValue(0, 3);
+    // t+=Raylib.getFrameTime();
+    // if(t >= 3) {
+    //   var b = new Bullet(x, y+16, spr.direction);
+    //   b.color = Raylib.Color.create(214, 26, 17, 255);
+    //   bullets.push(b);
+    // }
+    // } else {
+    //   x += 20 * -spr.direction;
+
+    // }
       if((y+32) < 180) killed = true;
       if(x > 420) killed = true;
       if(x < 28) killed = true;
-    }
+
+    spr.setSquashX(0.5);
+  }
 
     spr.x = x;
     spr.y = y;

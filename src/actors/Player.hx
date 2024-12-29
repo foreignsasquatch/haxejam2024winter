@@ -21,11 +21,11 @@ class Player {
 
   public var speed:Float = 3;
 
-  var sprite:Sprite;
+  public var sprite:Sprite;
 
   var bullets:Array<Bullet> = [];
 
-  public var debt = 2480;
+  public var debt = 2048;
 
   public function new() {
     x = 230;

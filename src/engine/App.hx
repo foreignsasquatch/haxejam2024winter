@@ -51,7 +51,7 @@ class App {
 
   static var ui:KumoRaylib;
   public function run(m:Class<Module>) {
-    Raylib.setTraceLogLevel(7);
+    // Raylib.setTraceLogLevel(7);
     Raylib.setConfigFlags(ConfigFlags.VSYNC_HINT);
     Raylib.initWindow(width, height, title);
     Raylib.initAudioDevice();

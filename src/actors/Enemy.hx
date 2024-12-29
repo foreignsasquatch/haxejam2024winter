@@ -14,7 +14,6 @@ class Enemy {
   }
 
   public function update() {
-    if(killed) Game.enemies.remove(this);
   }
 
   public function draw() {
