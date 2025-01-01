@@ -4,3 +4,4 @@
 --library raylib
 --library ase
 --library kumoui
+--library haxe-strings

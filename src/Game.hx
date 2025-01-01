@@ -1,3 +1,4 @@
+import hx.strings.Strings;
 import cpp.Pointer;
 import cpp.RawPointer;
 import Raylib.Shader;
@@ -234,7 +235,7 @@ class Game implements Module {
         var r = Raylib.Rectangle.create(Std.int(e.x - offx), Std.int(e.y-offy), 128+64, 32);
 
         if(enemyNames[0] == "Luigi") {
-          e.x += 1 * edir;
+          e.x += 0.8 * edir;
           e.spr.direction = edir;
           if(e.x > 420) edir = -1;
           if(e.x < 28) edir = 1;
@@ -421,7 +422,7 @@ class Game implements Module {
         else text("stay in the box!!!", px+asdasd.x+2, py, 8, fg);
         if(Raylib.isKeyPressed(Keys.ENTER)) {currentLinePlayer++;currentCharPlayer = 0;enemyAmount -= 64;lineTimer=20;enemies[enemy].newhit();player.shoot();changeHitDialogue = true;}
       } else
-        if(!canAttack) text("STAY IN THE BOX to type!!", px+asdasd.x+2, py, 8, fg);
+        if(!canAttack) text("move with arrow keys and STAY IN THE BOX to type!!", px+asdasd.x+2, py, 8, fg);
         else text("start typing the text below!!!", px+asdasd.x+2, py, 8, fg);
       py += 10;
 
@@ -443,7 +444,7 @@ class Game implements Module {
       py += 4;
       text(spl[currentLinePlayer], px, py, 8, bgc);
       text(spl[currentLinePlayer].substring(0, currentCharPlayer), px, py, 8, fg);
-      if(spl[currentLinePlayer].charAt(currentCharPlayer) == String.fromCharCode(Raylib.getCharPressed()) && canAttack) {currentCharPlayer++;cameraShake=true;}
+      if(Strings.toLowerCase8(spl[currentLinePlayer].charAt(currentCharPlayer)) == Strings.toLowerCase8(String.fromCharCode(Raylib.getCharPressed())) && canAttack) {currentCharPlayer++;cameraShake=true;}
       py += 8;
       var o = Raylib.measureTextEx(font, spl[currentLinePlayer].substring(0, currentCharPlayer), 8, 0);
       // text("^", px+o.x, py, 8, fg);
@@ -472,6 +473,7 @@ class Game implements Module {
       }
     }
   }
+
 
   function lerp(a:Float, b:Float, f:Float) {
     return a + f * (b - a);
